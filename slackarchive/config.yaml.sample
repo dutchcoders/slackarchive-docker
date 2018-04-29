@@ -1,0 +1,20 @@
+listen: 0.0.0.0:8080
+listen_tls: 0.0.0.0:8443
+
+team: {team_name}
+
+# remember to change the username and passwords!
+database:
+    dsn: mongodb://slackarchive:1234@mongodb:27017/slackarchive
+
+bot:
+    token: {ultra-secret-token}
+
+elasticsearch:
+    url: http://elasticsearch:9200/
+
+cookies:
+    authentication_key: "{random_authentication_key_here}"
+    encryption_key: "{random_encryption_key_here}"
+
+session_name: auth

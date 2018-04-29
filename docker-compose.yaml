@@ -1,0 +1,75 @@
+version: '3.2'
+services:
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin1234
+      - MONGO_INITDB_DATABASE=slackarchive
+    volumes:
+      - ./mongodb/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+      - ./mongodb/db:/data/db
+    networks:
+      - slackarchive
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.6.4
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
+    environment:
+      - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    cap_add:
+      - IPC_LOCK
+    networks:
+      - slackarchive
+  wait_for_dependencies:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      - mongodb
+      - elasticsearch
+    command: mongodb:27017 elasticsearch:9200 
+    networks:
+      - slackarchive
+  slackarchive-init:
+    image: dutchcoders/slackarchive-init:latest
+    networks:
+      - slackarchive
+  slackarchive:
+    image: dutchcoders/slackarchive:latest
+    environment:
+      MONGODB_URI: mongodb://slackarchive:1234@mongodb:27017/slackarchive
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    entrypoint: /slackarchive/slackarchive --config /config/config.yaml
+    volumes:
+      - ./scripts:/scripts:ro
+      - ./slackarchive/config.yaml:/config/config.yaml:ro
+    networks:
+        - slackarchive
+  slackarchive-bot:
+    image: dutchcoders/slackarchive-bot:latest
+    environment:
+      MONGODBURL: http://elasticsearch:9200/flow/events/
+      ELASTICSEARCH_URL: http://elasticsearch:9200/flow/events/
+    volumes:
+      - ./scripts:/scripts
+      - ./slackarchive-bot/data:/data
+      - ./slackarchive-bot/config.yaml:/config/config.yaml:ro
+    networks:
+        - slackarchive
+networks:
+    slackarchive:
+        external: true

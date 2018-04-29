@@ -1,0 +1,13 @@
+dsn: mongodb://slackarchive:1234@mongodb:27017/slackarchive
+
+data-dir: /data/
+
+elasticsearch:
+        host: http://elasticsearch:9200/
+
+api-url: "ws://slackarchive:8080/ws"
+api-token: {ultra-secret-token}
+
+tokens:
+        - {xoxb-token-here}
+
