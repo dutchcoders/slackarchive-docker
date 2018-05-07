@@ -22,5 +22,4 @@ docker-compose run --rm slackarchive-init
 
 docker-compose up slackarchive
 docker-compose up slackarchive-bot
-
 ```
