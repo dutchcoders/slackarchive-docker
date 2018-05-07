@@ -14,12 +14,18 @@ Finally, if you want additional security, change the MongoDB root username and p
 
 With all of these configuration options updates, you should now be able to start SlackArchive using the following commands:
 
+1. Create a virtual network in Docker for the containers to use.
 ```
 docker network create slackarchive
-
+```
+2. Initialize the dependencies, which are MongoDB and Elasticsearch.
+```
 docker-compose run --rm wait_for_dependencies
 docker-compose run --rm slackarchive-init
+```
 
+3. Finally, start the main service, including the SlackArchive bot.
+```
 docker-compose up slackarchive
 docker-compose up slackarchive-bot
 ```
